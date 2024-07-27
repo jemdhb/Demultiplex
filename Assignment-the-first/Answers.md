@@ -86,14 +86,14 @@ def demultiplex(str F1, str I1, str F2, str I2):
                 variables formatted f1_index, f1_quality, etc
 
                 #if both parts of the pair are high quality
-                if check_quality_thresholds(qual_line_f1)==True and check_quality_thresholds(qual_line_i1)==True:
+                if check_quality_thresholds(f1_quality)==True and check_quality_thresholds(i1_quality)==True:
                     #write to fastq
                     fastq_file=determine_output_file(f1_header, f1_index, f1_sequence, f1_quality)
                     fastq_record=format_fastq(f1_header, f1_index, f1_sequence, f1_quality)
                     fastq_file.write(fastq_record)
 
                 #if both parts of the pair are high quality
-                if check_quality_thresholds(qual_line_f2)==True and check_quality_thresholds(qual_line_i2)==True:
+                if check_quality_thresholds(f2_quality)==True and check_quality_thresholds(i2_quality)==True:
                     #write to fastq
                     fastq_file=determine_output_file(f2_header, f2_index, f2_sequence, f2_quality)
                     format_fastq(f2_header, f2_index, f2_sequence, f2_quality)
