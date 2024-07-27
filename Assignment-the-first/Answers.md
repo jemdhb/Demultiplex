@@ -1,6 +1,7 @@
 # Assignment the First
 
 ## Part 1
+
 1. Be sure to upload your Python script. Provide a link to it here:
 
 | File name | label | Read length | Phred encoding |
@@ -25,7 +26,7 @@
 3. Upload your [4 input FASTQ files](../TEST-input_FASTQ) and your [>=6 expected output FASTQ files](../TEST-output_FASTQ).
 4. Pseudocode
 
-### See my function definitions below if the pseudocode makes no sense :duck:
+### See my #5 function definitions if the pseudocode makes no sense :heart: :duck: :heart:
 
 ```bash
 def demultiplex(str F1, str I1, str F2, str I2):
@@ -34,7 +35,7 @@ def demultiplex(str F1, str I1, str F2, str I2):
 
     #open files
     with open F1, I1, F2, I2 as f1, i1, f2, i2:
-        #going line by line
+        #going line by line (fn=biological record, in=index record)
         for line_f1, line_f2, line_i1, line_i2 in f1, i1, f2, i2:
 
             #new record, write header info
@@ -47,10 +48,10 @@ def demultiplex(str F1, str I1, str F2, str I2):
                 sequence_info=[]
 
                 #lines match and indices match
-                if line_i1 == line_i2.rc and verify_index_match(index1, index2): 
+                if line_i1 == line_i2.rc and verify_index_match(line_i1, line_i2): 
 
                     #since indices match only need to check one
-                    if search_for_index_match(line_i1) is True:
+                    if search_for_index_match(line_i1)==True:
                         #if indices are matching and valid, can append all data
                         sequence_info.append(line_f1, line_f2, line_i1, line_i2)
 
@@ -58,8 +59,8 @@ def demultiplex(str F1, str I1, str F2, str I2):
                 elif line_i1 == line_i2.rc:
 
                     #if lines dont match and indices are invalid
-                    if search_for_index_match(line_i1) is False and\
-                    search_for_index_match(line_i1) is False:
+                    if search_for_index_match(line_i1)==False and\
+                    search_for_index_match(line_i1)==False:
                         continue #no record to write
 
                     #need to check separately since indices dont match
@@ -76,20 +77,28 @@ def demultiplex(str F1, str I1, str F2, str I2):
                     continue #skip this record
 
                 #if some surviving data from this record
-                qual_line_f1=calculate_per_base_quality(line_f1)
-                qual_line_i1=calculate_per_base_quality(line_i1)
-                qual_line_f2=calculate_per_base_quality(line_f2)
-                qual_line_i2=calculate_per_base_quality(line_i2)
+                f1_quality=calculate_per_base_quality(line_f1)
+                i1_quality=calculate_per_base_quality(line_i1)
+                f2_quality=calculate_per_base_quality(line_f2)
+                i2_quality=calculate_per_base_quality(line_i2)
+
+                pull out information from header_info and sequence_info into named
+                variables formatted f1_index, f1_quality, etc
 
                 #if both parts of the pair are high quality
                 if check_quality_thresholds(qual_line_f1)==True and check_quality_thresholds(qual_line_i1)==True:
                     #write to fastq
-                    format_fastq(f1_header, f1_index, f1_sequence, f1_quality)
+                    fastq_file=determine_output_file(f1_header, f1_index, f1_sequence, f1_quality)
+                    fastq_record=format_fastq(f1_header, f1_index, f1_sequence, f1_quality)
+                    fastq_file.write(fastq_record)
 
                 #if both parts of the pair are high quality
                 if check_quality_thresholds(qual_line_f2)==True and check_quality_thresholds(qual_line_i2)==True:
                     #write to fastq
+                    fastq_file=determine_output_file(f2_header, f2_index, f2_sequence, f2_quality)
                     format_fastq(f2_header, f2_index, f2_sequence, f2_quality)
+                    fastq_file.write(fastq_record)
+
 ```
 
 5. High level functions. For each function, be sure to include:
@@ -134,4 +143,9 @@ if any bp is below the threshold, return False. If you fully iterate through the
 read, return True
 """
 return boolean #^see above for specifications
+
+def determine_output_file(str header, str sequence, str index, str quality):
+"""Based on the record information provided, determine unique output file name
+"""
+return output_file_name #string of output file name
 ```
