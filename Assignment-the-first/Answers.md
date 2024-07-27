@@ -96,7 +96,7 @@ def demultiplex(str F1, str I1, str F2, str I2):
                 if check_quality_thresholds(f2_quality)==True and check_quality_thresholds(i2_quality)==True:
                     #write to fastq
                     fastq_file=determine_output_file(f2_header, f2_index, f2_sequence, f2_quality)
-                    format_fastq(f2_header, f2_index, f2_sequence, f2_quality)
+                    fastq_record=format_fastq(f2_header, f2_index, f2_sequence, f2_quality)
                     fastq_file.write(fastq_record)
 
 ```
