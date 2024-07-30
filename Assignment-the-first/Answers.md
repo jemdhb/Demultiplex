@@ -6,10 +6,10 @@
 
 | File name | label | Read length | Phred encoding |
 |---|---|---|---|
-| 1294_S1_L008_R1_001.fastq.gz |  |  | 33 |
-| 1294_S1_L008_R2_001.fastq.gz |  |  | 33 |
-| 1294_S1_L008_R3_001.fastq.gz |  |  | 33 |
-| 1294_S1_L008_R4_001.fastq.gz |  |  | 33 |
+| 1294_S1_L008_R1_001.fastq.gz | R1  | 101 | 33 |
+| 1294_S1_L008_R2_001.fastq.gz | R2 | 8 | 33 |
+| 1294_S1_L008_R3_001.fastq.gz | R3 | 8 | 33 |
+| 1294_S1_L008_R4_001.fastq.gz | R4 | 101 | 33 |
 
 2. Per-base NT distribution
     1. Use markdown to insert your 4 histograms here.
@@ -19,8 +19,7 @@
 ## Part 2
 
 1. Define the problem
-    1. We need to demultiplex are four read files, throwing out any biological-index pairs.
-    with unknown or hopped indices
+    1. We need to demultiplex are four read files, separating properly paired barcode reads with unknown or hopped indices. Unknown is defined as unknown barcodes, or low quality barcodes. Hopped is when two different, known barcodes are assigned to the same record. 
 2. Describe output
     1. My output will be n>=6 FASTQ files each with unique relevant labels
 3. Upload your [4 input FASTQ files](../TEST-input_FASTQ) and your [>=6 expected output FASTQ files](../TEST-output_FASTQ).

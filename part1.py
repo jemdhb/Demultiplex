@@ -2,6 +2,8 @@
 import bioinfo
 import numpy as np
 import argparse
+import gzip   
+
 def get_args():
     parser = argparse.ArgumentParser(description="Demultiplex interpreter")
     parser.add_argument("-f", "--filename",
@@ -18,11 +20,25 @@ if run=="R2" or run=="R3":
 else:
     array_len=101 #biological
 q=np.zeros(array_len,)
-for line_num,line in enumerate(open(file_name,"r")):
-    line=line.strip()
-    for pos,char in enumerate(line):
-        #running sum
-        q[pos]+=bioinfo.convert_phred(char)
-q=[sum/line_num for sum in q]
-print("per base read: ",q)
-print(np.mean(q))
+with gzip.open(file_name,"rb") as zipf:
+    line_num=-1
+    while True:
+        line_num+=1
+        line=zipf.readline().decode().strip()
+        if line=="":
+            break            
+        if line_num%4==3:
+            for pos,char in enumerate(list(line)):
+                #running sum
+                q[pos]+=bioinfo.convert_phred(str(char))
+q=[sum/(line_num/4) for sum in q]
+#print("read len of ",file_name,len(q))
+print(f"index\tmean")
+for i, item in enumerate(q):
+    print(f"{i}\t{item}")
+print(f"avg\t{np.mean(q)}")
+
+#/projects/bgmp/shared/2017_sequencing/1294_S1_L008_R1_001.fastq.gz
+#/projects/bgmp/shared/2017_sequencing/1294_S1_L008_R2_001.fastq.gz
+#/projects/bgmp/shared/2017_sequencing/1294_S1_L008_R3_001.fastq.gz
+#/projects/bgmp/shared/2017_sequencing/1294_S1_L008_R4_001.fastq.gz
