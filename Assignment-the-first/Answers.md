@@ -17,12 +17,19 @@
 2. Per-base NT distribution
     1. Use markdown to insert your 4 histograms here.
 R1
+
 ![text](results/R1_means.png)
+
 R2
+
 ![text](results/R2_means.png)
+
 R3
+
 ![text](results/R3_means.png)
+
 R4
+
 ![text](results/R4_means.png)
 
 ## Part 2
