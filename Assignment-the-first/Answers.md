@@ -2,7 +2,10 @@
 
 ## Part 1
 
-1. Be sure to upload your Python script. Provide a link to it here:
+1. Be sure to upload your Python script. Provide a link to it here: 
+[part1.py](https://github.com/jemdhb/Demultiplex/blob/master/Assignment-the-first/part1.py)
+[part1_graphs.py](https://github.com/jemdhb/Demultiplex/blob/master/Assignment-the-first/part1_graphs.py)
+
 
 | File name | label | Read length | Phred encoding |
 |---|---|---|---|
@@ -126,7 +129,7 @@ VALID_INDICES_SET==("AACAGCGA",...,"TGTTCCGT")
 ```
 
 ```bash
-def verify_index_match(index1, index2):
+def verify_index_match(str index1, str index2):
     """
     function to determine if index1 and index1 are matching
     """
@@ -137,7 +140,7 @@ verify_index_match("AA","AT")==False
 ```
 
 ```bash
-def search_for_index_match(index):
+def search_for_index_match(str index):
     """check to see if index is in our known list of indices (VALID_INDICES_SET)
     """
     return index in VALID_INDICES_SET
@@ -154,7 +157,8 @@ def format_fastq(header="", index1="", index2="", sequence="", quality=""):
     return formatted_fastq #str version of our record
 
 format_fastq("@ex","aa","aa","tttgggccc","IIIIII")==\
-"""@ex aa-aa
+"""
+@ex aa-aa
 tttggg
 +
 IIIIII
@@ -162,7 +166,7 @@ IIIIII
 ```
 
 ```bash
-def calculate_per_base_quality(quality):
+def calculate_per_base_quality(list quality):
     """For each base in the quality string, calculate the phred33 quality score
     """
     return [bioinfo.convert_phred(qual) for qual in quality] #list of quality floats
@@ -171,7 +175,7 @@ calculate_per_base_quality(["II"])==[ 40.0, 40.0 ]
 ```
 
 ```bash
-def check_quality_thresholds(qualities,index=True):
+def check_quality_thresholds(list qualities,index=True):
     """iterate through qualities verifying that each bp meets our quality threshold
     (which will change whether were examining index data or biological read data)
     if any bp is below the threshold, return False. If you fully iterate through the
@@ -184,7 +188,7 @@ check_quality_thresholds([30,30,40,40,42,42,42,42])==True
 ```
 
 ```bash
-def reverse_complement(seq):
+def reverse_complement(str seq):
     """reverse complement a sequence
     """
     return rc_seq #our string reverse complimented
@@ -193,7 +197,7 @@ reverse_complement("AA")=="TT"
 ```
 
 ```bash
-def open_files_of_interest(barcodes_set):
+def open_files_of_interest(set barcodes_set):
     """open all output file handles for easy access during input file traversal
     """
     return all_fh #dictionary where key is formatted barcode_FN and value is relevant fh
@@ -214,7 +218,7 @@ close_files_of_interest(ALL_FILE_HANDLES)#all files in ALL_FILE_HANDLES will be 
 ```
 
 ```bash
-def demultiplex(file1, index1, file2, index2):
+def demultiplex(str file1, str index1, str file2, str index2):
     """driver function to read through our four files and perform ~demultiplexing~
     """
     return None #(but files will be written and populated, see #3 for more details)
