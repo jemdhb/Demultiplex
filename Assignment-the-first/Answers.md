@@ -13,8 +13,14 @@
 
 2. Per-base NT distribution
     1. Use markdown to insert your 4 histograms here.
-    2. **YOUR ANSWER HERE**
-    3. **YOUR ANSWER HERE**
+R1
+![text](results/R1_means.png)
+R2
+![text](results/R2_means.png)
+R3
+![text](results/R3_means.png)
+R4
+![text](results/R4_means.png)
 
 ## Part 2
 
@@ -106,45 +112,110 @@ def demultiplex(str F1, str I1, str F2, str I2):
     3. Test examples for individual functions
     4. Return statement
 
+### Functions reflect current state of my Part 3 code NOT the above pseudocode
+
+```bash
+def create_index_set():
+    """
+    Populates our global variable holding all possible barcodes in a set from indexes.txt
+    """
+    return None
+
+create_index_set()
+VALID_INDICES_SET==("AACAGCGA",...,"TGTTCCGT")
+```
+
+```bash
+def verify_index_match(index1, index2):
+    """
+    function to determine if index1 and index1 are matching
+    """
+    return index1.strip().lower()==index2.strip().lower()
+
+verify_index_match("AA","AA")==True
+verify_index_match("AA","AT")==False
+```
+
+```bash
+def search_for_index_match(index):
+    """check to see if index is in our known list of indices (VALID_INDICES_SET)
+    """
+    return index in VALID_INDICES_SET
+
+search_for_index_match("NNN")==False
+search_for_index_match("AACAGCGA")==True
+```
+
+```bash
+def format_fastq(header="", index1="", index2="", sequence="", quality=""):
+    """Format our known, high quality read into a fastq record, appending on the 
+    added index information
+    """
+    return formatted_fastq #str version of our record
+
+format_fastq("@ex","aa","aa","tttgggccc","IIIIII")==\
+"""@ex aa-aa
+tttggg
++
+IIIIII
+"""
+```
+
+```bash
+def calculate_per_base_quality(quality):
+    """For each base in the quality string, calculate the phred33 quality score
+    """
+    return [bioinfo.convert_phred(qual) for qual in quality] #list of quality floats
+
+calculate_per_base_quality(["II"])==[ 40.0, 40.0 ]
+```
+
+```bash
+def check_quality_thresholds(qualities,index=True):
+    """iterate through qualities verifying that each bp meets our quality threshold
+    (which will change whether were examining index data or biological read data)
+    if any bp is below the threshold, return False. If you fully iterate through the
+    read, return True
+    """
+    return boolean #^see above for specifications
+
+check_quality_thresholds([2,30,2,2,2,2,2,2])==False
+check_quality_thresholds([30,30,40,40,42,42,42,42])==True
+```
+
+```bash
+def reverse_complement(seq):
+    """reverse complement a sequence
+    """
+    return rc_seq #our string reverse complimented
+
+reverse_complement("AA")=="TT"
+```
+
+```bash
+def open_files_of_interest(barcodes_set):
+    """open all output file handles for easy access during input file traversal
+    """
+    return all_fh #dictionary where key is formatted barcode_FN and value is relevant fh
+
+ALL_FILE_HANDLES= open_files_of_interest(VALID_INDICES_SET)== \
+                                            {"AACAGCGA_F1": open("AACAGCGA_F1.fq","w"),
+                                            "unknown_F1": open("unknown_F1.fq","w"),
+                                            "hopped_F2":open("hopped_F2.fq","w"),...}
+```
+
+```bash
+def close_files_of_interest():
+    """close all fh in file handle dictionary created by open_files_of_interest
+    """
+    return None
+
+close_files_of_interest(ALL_FILE_HANDLES)#all files in ALL_FILE_HANDLES will be closed
+```
+
 ```bash
 def demultiplex(file1, index1, file2, index2):
-"""driver function to read through our four provided files and perform demultiplexing"""
-    return True #if demultiplexing was successful
-    return False #otherwise
-
-def verify_index_match(index1, index2):
-"""function to determine if index1 and index1 are matching
-"""
-return True #for match
-return False #for mismatch
-
-def search_for_index_match(index):
-"""check to see if index is in our known list of indices
-"""
-return True #if match is found
-return False #if not match found
-
-def format_fastq(str header, str index, str sequence, str quality):
-"""Format our known, high quality read into a fastq record, appending on the 
-added index information
-"""
-return formatted_fastq # our formatted fastq record as a string
-
-def calculate_per_base_quality(str quality):
-"""For each base in the quality string, calculate the phred33 quality score
-"""
-return quality_lits #list of floats of quality scores at each index
-
-def check_quality_thresholds(list qualities,index=True):
-"""iterate through qualities verifying that each bp meets our threshold
-(which will change whether were examining index data or biological read data)
-if any bp is below the threshold, return False. If you fully iterate through the
-read, return True
-"""
-return boolean #^see above for specifications
-
-def determine_output_file(str header, str sequence, str index, str quality):
-"""Based on the record information provided, determine unique output file name
-"""
-return output_file_name #string of output file name
+    """driver function to read through our four files and perform ~demultiplexing~
+    """
+    return None #(but files will be written and populated, see #3 for more details)
 ```

@@ -1,0 +1,11 @@
+Total Number of Records: 3
+
+Record breakdown by category:
+Unknown records: 33.33%
+Hopped records:  33.33%
+Matched records: 33.33%
+
+Detailed record breakdown:
+unknown records: 33.33%
+TGTTCCGT TGTTCCGT records: 33.33%
+CTCTGGAT AACAGCGA records: 33.33%
