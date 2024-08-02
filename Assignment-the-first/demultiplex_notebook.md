@@ -177,12 +177,19 @@ ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
 ```
 
 R1
+
 ![text](results/R1_means.png)
+
 R2
+
 ![text](results/R2_means.png)
+
 R3
+
 ![text](results/R3_means.png)
+
 R4
+
 ![text](results/R4_means.png)
 
 These results matched my peers are were as I expected after listening the Bi622 lectures (quality improving over the read, R2 quality being superior to R3). With this I felt comfortable moving forward with part3.
