@@ -61,8 +61,11 @@ zcat 1294_S1_L008_R4_001.fastq.gz | head -n 40 | grep "^@K00337" -B 1 | grep -vE
 ```
 
 R1 average: `45.02145214521452`
+
 R2 average: `35.203125`
+
 R3 average: `33.44642857142857`
+
 R4 average: `51.603960396039604`
 
 These averages correspond with Phred-33 encoding.
@@ -110,7 +113,7 @@ index   mean
 
 ![text](data_exploration/R1_OLD_means.png)
 
-Examining these results I realized I was grabbing the `+` line NOT the quality line :clown:
+Examining these results I realized I was grabbing the `+` line NOT the quality line :sob:
 
 After updating my modulous I proceeded with my sbatch script
 
