@@ -1,4 +1,4 @@
-#!/bin/bash Python
+#!/usr/bin/env python
 import bioinfo
 import numpy as np
 import argparse

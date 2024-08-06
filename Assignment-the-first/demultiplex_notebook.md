@@ -212,11 +212,15 @@ I brainstormed my approach for this in `Assignment-the-first/Answers.md`:
 
 # Part 3:
 
+## :boom:Revelations:boom: from peer-reviews
 After recieving my Part 2 feedback and reading other's code I changed the following:
 
 1. When I read Claire's pseudocode, I realized I handled quality checking way too early which complicated things.
-    1. I changed my logic to creating my records BEFORE verifying any barocde quality
-2. For writing to my files I initally did the following
+    1. I changed my logic to creating my records BEFORE verifying any barocde quality:
+
+    ![p](../pseudocode.png)
+
+2. For writing to my output files I initally did the following
 
     ```bash
     try:
@@ -225,47 +229,136 @@ After recieving my Part 2 feedback and reading other's code I changed the follow
         open(file, "w")
     ```
 
-    1. After listening to Leslie's lecture, I realized though not as slow as constantly writing, this would take an estimated 42 hours!
-    2. I created the functions.
-3. Created my reverse compliment function `reverse_compliment`
-4. Deleted my  `determine_output_file` as I realized my if statements served the same purpose.
-5. Updated my `format_fastq` to add information I was previously missing in my headers.
-6. Had planned sliding qualities but while in the testing phase I kept my quality threshold to a global 30.
-7. Changed my naming so all hopped and unknown barcodes are grouped in two files.
+    1. After listening to Leslie's lecture, I realized though not as slow as constantly writing (82 hours), this would take an estimated 42 hours!
+        1. Brainstormed the best solution was to save all of my open output files handles into a dictionary where the key is the case in which I would use this. 
+    2. I created some new functions.
+        1. Created my reverse compliment function `reverse_compliment`
+        2. Deleted my  `determine_output_file` as I realized my if statements served the same purpose.
+        3. Updated my `format_fastq` to add information I was previously missing in my headers.
+        4. Had planned sliding qualities but while in the testing phase I kept my quality threshold to a global 26.
+        5. Changed my naming so all hopped and unknown barcodes are grouped in two files.
+
+Since I wrote my pseudocode very code-like, after the above revelations I filled in my pseudocode functions and was ready to test my code.
+
+## Creating test files
+
+For my first test file I wanted to make sure all of my functions worked on a very simple case: everything going to unknown
+
+Created by the command:
+
+```bash
+(bgmp_demultiplex) [jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R1_001.fastq.gz | head -n 8 > r1_test.fq
+(bgmp_demultiplex)[jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R2_001.fastq.gz | head -n 8 > r2_test.fq
+(bgmp_demultiplex)[jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R3_001.fastq.gz | head -n 8  > r3_test.fq
+(bgmp_demultiplex)[jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R4_001.fastq.gz | head -n 8 > r4_test.fq
+```
+
+**Note:** I later changed these files to what I turned in for part1, once I thought my code was ready to handle all cases
 
 To create my second test files 100 sequences:
+
 ```bash
-(base) (base) [jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R1_001.fastq.gz | head -n 400000 | tail -n 400 > r1_mid_test.fq
-(base) (base) [jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R2_001.fastq.gz | head -n 40
+(bgmp_demultiplex)[jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R1_001.fastq.gz | head -n 400000 | tail -n 400 > r1_mid_test.fq
+(bgmp_demultiplex) [jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R2_001.fastq.gz | head -n 40
 0000 | tail -n 400 > r2_mid_test.fq
-(base) (base) [jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R3_001.fastq.gz | head -n 40
+(bgmp_demultiplex) [jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R3_001.fastq.gz | head -n 40
 0000 | tail -n 400 > r3_mid_test.fq
-(base) (base) [jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R4_001.fastq.gz | head -n 40
+(bgmp_demultiplex) [jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R4_001.fastq.gz | head -n 40
 0000 | tail -n 400 > r4_mid_test.fq
 ```
 
-To create my first test file 2 sequences (both to unknown):
+At this point, my code successfully wrote to the proper files on smaller test files, but I knew it would be too slow to run on the main file. Thus I began working on some optimizations.
+
+## Optimizations
+
+*I worked with Claire, Jules, Varsheni, and Kenny to help them get their part 3 code started, while working with them numerous optimizations were made*
+
+### Still opening a file 353 million times :skull:
+
+When examining my functions, I realized that my `search_for_index_match` was a huge bottleneck for my code.
 
 ```bash
-(base) (base) [jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R1_001.fastq.gz | head -n 8 > r1_test.fq
-(base) (base) [jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R2_001.fastq.gz | head -n 8 > r2_test.fq
-(base) (base) [jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R3_001.fastq.gz | head -n 8  > r3_test.fq
-(base) (base) [jujo@n0349 Demultiplex]$ zcat /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R4_001.fastq.gz | head -n 8 > r4_test.fq
+def search_for_index_match(index):
+    """check to see if index is in our known list of indices
+    """
+    for item in open("index.txt"):
+        if item.split()[-1]==index:
+            return True
+        
+    return False
 ```
 
-made my index verification a set because I was opening the file for every record
+This code opens `index.txt` every time and in the worst case has to run through the entire file.
 
-- this made my code x2 as fast as my original implementation
+After speaking with Varsheni, I decided to run through `index.txt` once, building a set of all possible barcodes (see `x` for the full implementation). I could then just check that set within `search_for_index_match`, making that function one line
 
-made my file opening use the index as well 
+```bash
+    return (index in VALID_INDICES_SET)
+```
 
-had weird erorr where i had to strip my quality lines because a newline is -23 phred!
+- Even on my small test files, this made my code **twice** as fast as my original implementation
 
-realized that my barcode check fails to do a simple toss out if an N exists
+### micro-optimization: file dictionary creation
 
-simplified my keys for the my file handle barcode
+- made my file opening use the index as well 
 
-started extended statistics
+### introducing new functions causing errors :sob:
 
+- had weird erorr where i had to strip my quality lines because a newline is -23 phred!
+
+### Logic fail
+
+- realized that my barcode check fails to do a simple toss out if an N exists
+
+### micro-optimization: key simplification
+
+- simplified my keys for the my file handle barcode
+
+### Extended statistics
+- decided to do challenge problem
+- talapas freeze
+
+### arg parse
 added arg parse
 
+## Napkin math
+
+To ensure my code was reasonable enough to run:
+
+Timed how long one record takes (to be able to estimate constant operations): `0.05` seconds
+
+Timed how long 100 records takes: `0.05` seconds again:question: Decided to increase test file size to 1,000 records.
+
+Timed how long 1000 records takes: `0.08` seconds
+
+- Removing constant operations: `0.08-0.05 = 0.03`
+
+We have 343,246,753 records aka 343,246.753 1,000 record segments. Timing-wise this equates to `343246.753(0.03)=10297.40259 seconds`
+
+- Converting this to hours: 10297.40259 seconds :arrow_right: 171.62 minutes :arrow_right: 2.8 hours.
+
+I felt 2.8 hours was quick enough to proceed and created my sbatch script
+
+added argparse
+tried running for 1 min outside of sbatch to see if anything happened, no errors so i proceeded.
+
+## Actual run
+
+Actual run was two times faster than predicted :heart:
+```bash
+Command being timed: \
+"python part3.py\
+-r1 /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R1_001.fastq.gz \
+-r2 /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R2_001.fastq.gz\
+-r3 /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R3_001.fastq.gz \
+-r4 /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R4_001.fastq.gz"
+User time (seconds): 4147.22
+System time (seconds): 93.83
+Percent of CPU this job got: 88%
+Elapsed (wall clock) time (h:mm:ss or m:ss): 1:19:59
+Maximum resident set size (kbytes): 251980
+Exit status: 0
+```
+
+
+add plot to show known barcodes percentages plot 
