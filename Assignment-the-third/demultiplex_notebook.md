@@ -111,7 +111,7 @@ index   mean
 16	0.0
 ```
 
-![text](data_exploration/R1_OLD_means.png)
+![text](../Assignment-the-first/data_exploration/R1_OLD_means.png)
 
 Examining these results I realized I was grabbing the `+` line NOT the quality line :sob:
 
