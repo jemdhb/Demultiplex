@@ -306,20 +306,16 @@ After speaking with Varsheni, I decided to run through `index.txt` once, buildin
 
 - had weird erorr where i had to strip my quality lines because a newline is -23 phred!
 
-### Logic fail
-
-- realized that my barcode check fails to do a simple toss out if an N exists
-
 ### micro-optimization: key simplification
 
 - simplified my keys for the my file handle barcode
 
-### Extended statistics
+### Extended statistics: itertools
 - decided to do challenge problem
-- talapas freeze
+- talapas freeze when i did not specify permutation 2
 
 ### arg parse
-added arg parse
+- added arg parse
 
 ## Napkin math
 
@@ -360,5 +356,102 @@ Maximum resident set size (kbytes): 251980
 Exit status: 0
 ```
 
+This run was much quicker than I expected, and my statisitics file looked correct when I skimmed it it over
 
-add plot to show known barcodes percentages plot 
+```bash 
+Total Number of Records: 363246735
+
+Record breakdown by category:
+Unknown Records: 12.9300% 
+Hopped Records: 0.1680% 
+Matched Records: 86.9021% 
+
+Detailed record breakdown:
+TACCGGAT TACCGGAT records: 19.85% 
+```
+
+After speaking with Leslie, I decided to add raw counts besides the percentages and some plots. My plots were as follows:
+- One plot to show the **percentage** of each valid barcode pair that mapped (e.g., TACCGGAT-TACCGGAT=20%)
+- One plot to show the **raw counts** of the **top twenty** hopped barcode combinations.
+
+Because I did not save my raw counts, I had to run my sbatch script again:
+
+```bash
+Command being timed: "python part3.py 
+-r1 /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R1_001.fastq.gz \
+-r2 /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R2_001.fastq.gz \
+-r3 /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R3_001.fastq.gz \
+-r4 /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R4_001.fastq.gz"
+	User time (seconds): 4039.71
+	System time (seconds): 111.93
+	Percent of CPU this job got: 87%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:19:04
+	Maximum resident set size (kbytes): 298816
+	Exit status: 0
+```
+
+My graphing worked as intended for my matched reads but I finally noticed that though the general stats were correct (% matched, % hopped, % unknown) my percentage breakdowns for hopped barcodes were all at 0.0%.
+
+- Initially, I thought that I truncated had an issue with truncation but I eventually realized my error was very dumb
+
+```  bash
+        stats_info[(sequence_info["i1"],sequence_info["i2"])]
+```
+
+I never incremented hopped barcodes when I encountered them :x:
+
+**Note** While troubleshooting this, I spoke with Shayal and realized that my header dictionary didn't need i1 and i2, so I removed those.
+
+Because I did not actually get my hopped barcode counts, I needed to run this code AGAIN. Thankfully this was my fastest run yet.
+
+```bash
+Command being timed: "python part3.py \
+-r1 /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R1_001.fastq.gz \
+-r2 /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R2_001.fastq.gz \
+-r3 /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R3_001.fastq.gz \
+-r4 /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R4_001.fastq.gz"
+User time (seconds): 3183.09
+System time (seconds): 46.35
+Percent of CPU this job got: 88%
+Elapsed (wall clock) time (h:mm:ss or m:ss): 1:00:43
+Maximum resident set size (kbytes): 307632
+Exit status: 0
+```
+
+My hopped barcodes were now counted in my extended stats text file BUT my graph was unreadable :sob:
+
+![](../my_test_files/scary_hopped_counts_by_barcode.png)
+
+Thankfully this was an easy fix and I only had to rerun the graphing code. I changed my results to only graph the top 20 hopped barcodes. I also switched from using append to insert so I am not wasting time reversing my data in my graphing call. 
+
+## Final output for real
+
+### Hopped counts by barcode pair
+
+![](../outfiles/hopped_counts_by_barcode.png)
+
+### % mapped by barcode pair
+
+![](../outfiles/percent_mapped_by_barcode.png)
+
+### Extended stats snippet
+
+```bash
+Total Number of Records: 363246735
+
+Record breakdown by category:
+Unknown Records: 12.9300% (46967706)
+Hopped Records: 0.1680% (610138)
+Matched Records: 86.9021% (315668891)
+
+Detailed record breakdown:
+TACCGGAT TACCGGAT records: 19.85% (72116897)
+Unknown records: 12.93% (46967706)
+TCTTCGAC TCTTCGAC records: 10.97% (39850432)
+```
+
+### Results interpretation
+
+- Hopping is very uncommon
+- Certain barcodes are heavily favored over others
+- The most common hopped pairs consist of the most common mapped barcodes (makes sense as there are more of them around-->higher risk of error)
