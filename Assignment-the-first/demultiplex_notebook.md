@@ -218,7 +218,7 @@ After recieving my Part 2 feedback and reading other's code I changed the follow
 1. When I read Claire's pseudocode, I realized I handled quality checking way too early which complicated things.
     1. I changed my logic to creating my records BEFORE verifying any barocde quality:
 
-    ![p](../pseudocode.png)
+    ![p](../Assignment-the-third/my_test_files/pseudocode.png)
 
 2. For writing to my output files I initally did the following
 
@@ -311,11 +311,26 @@ After speaking with Varsheni, I decided to run through `index.txt` once, buildin
 - simplified my keys for the my file handle barcode
 
 ### Extended statistics: itertools
-- decided to do challenge problem
-- talapas freeze when i did not specify permutation 2
 
-### arg parse
-- added arg parse
+- Decided to add my extended statistics.
+- Talapas froze when I did not specify permutation 2 to be two.
+- Ended up changing my final logic to:
+
+```bash
+#all hopped barcodes
+l=list(itertools.permutations(list(VALID_INDICES_SET),2))
+#all matched barcodes
+for item in VALID_INDICES_SET:
+    l.append((item,item))
+#all idk barcodes
+l.append("unk")
+#set default value to zero 
+return {key: 0 for key in l}
+```
+
+### Arg parse
+
+- Added arg parse to read in my input files.
 
 ## Napkin math
 
@@ -335,12 +350,12 @@ We have 343,246,753 records aka 343,246.753 1,000 record segments. Timing-wise t
 
 I felt 2.8 hours was quick enough to proceed and created my sbatch script
 
-added argparse
-tried running for 1 min outside of sbatch to see if anything happened, no errors so i proceeded.
+- I tried running my script for 1 min outside of sbatch to see if anything happened, no errors so I proceeded.
 
 ## Actual run
 
 Actual run was two times faster than predicted :heart:
+
 ```bash
 Command being timed: \
 "python part3.py\
@@ -356,7 +371,7 @@ Maximum resident set size (kbytes): 251980
 Exit status: 0
 ```
 
-This run was much quicker than I expected, and my statisitics file looked correct when I skimmed it it over
+This run was much quicker than I expected, and my statisitics file looked correct when I skimmed it over
 
 ```bash 
 Total Number of Records: 363246735
@@ -371,7 +386,9 @@ TACCGGAT TACCGGAT records: 19.85%
 ```
 
 After speaking with Leslie, I decided to add raw counts besides the percentages and some plots. My plots were as follows:
+
 - One plot to show the **percentage** of each valid barcode pair that mapped (e.g., TACCGGAT-TACCGGAT=20%)
+
 - One plot to show the **raw counts** of the **top twenty** hopped barcode combinations.
 
 Because I did not save my raw counts, I had to run my sbatch script again:
@@ -382,13 +399,15 @@ Command being timed: "python part3.py
 -r2 /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R2_001.fastq.gz \
 -r3 /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R3_001.fastq.gz \
 -r4 /projects/bgmp/shared/2017_sequencing/1294_S1_L008_R4_001.fastq.gz"
-	User time (seconds): 4039.71
-	System time (seconds): 111.93
-	Percent of CPU this job got: 87%
-	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:19:04
-	Maximum resident set size (kbytes): 298816
-	Exit status: 0
+User time (seconds): 4039.71
+System time (seconds): 111.93
+Percent of CPU this job got: 87%
+Elapsed (wall clock) time (h:mm:ss or m:ss): 1:19:04
+Maximum resident set size (kbytes): 298816
+Exit status: 0
 ```
+
+### Missed hopped reads
 
 My graphing worked as intended for my matched reads but I finally noticed that though the general stats were correct (% matched, % hopped, % unknown) my percentage breakdowns for hopped barcodes were all at 0.0%.
 
@@ -401,6 +420,8 @@ My graphing worked as intended for my matched reads but I finally noticed that t
 I never incremented hopped barcodes when I encountered them :x:
 
 **Note** While troubleshooting this, I spoke with Shayal and realized that my header dictionary didn't need i1 and i2, so I removed those.
+
+## Actual run again :)
 
 Because I did not actually get my hopped barcode counts, I needed to run this code AGAIN. Thankfully this was my fastest run yet.
 
@@ -420,21 +441,30 @@ Exit status: 0
 
 My hopped barcodes were now counted in my extended stats text file BUT my graph was unreadable :sob:
 
-![](../my_test_files/scary_hopped_counts_by_barcode.png)
+![](../Assignment-the-third/my_test_files/scary_hopped_counts_by_barcode.png)
+
 
 Thankfully this was an easy fix and I only had to rerun the graphing code. I changed my results to only graph the top 20 hopped barcodes. I also switched from using append to insert so I am not wasting time reversing my data in my graphing call. 
 
-## Final output for real
+### Final output for real
 
-### Hopped counts by barcode pair
+#### Hopped counts by barcode pair
 
-![](../outfiles/hopped_counts_by_barcode.png)
+![](../Assignment-the-third/results/hopped_counts_by_barcode.png)
 
-### % mapped by barcode pair
+- TGTTCCGT both involved in the top two hopped barcode combinations
+- Sharp decrease in frequencies after the first two hopped barcodes
 
-![](../outfiles/percent_mapped_by_barcode.png)
+#### % mapped by barcode pair
 
-### Extended stats snippet
+![](../Assignment-the-third/results/percent_mapped_by_barcode.png)
+
+- TACCGGAT is by far the most common barcode pair.
+- Sharp decrease adter the top three matched barcodes.
+
+#### Extended stats snippet
+
+See full output at `Assignment-the-third/results/extended_stats.txt`
 
 ```bash
 Total Number of Records: 363246735
@@ -450,8 +480,8 @@ Unknown records: 12.93% (46967706)
 TCTTCGAC TCTTCGAC records: 10.97% (39850432)
 ```
 
-### Results interpretation
+## Final results interpretation
 
-- Hopping is very uncommon
-- Certain barcodes are heavily favored over others
-- The most common hopped pairs consist of the most common mapped barcodes (makes sense as there are more of them around-->higher risk of error)
+- Hopping is **very** uncommon.
+- Certain barcodes are heavily favored over others even in matched pairs.
+- The most common hopped pairs consist of the most common mapped barcodes (makes sense as there are more of them around, leading to a higher risk of error).
